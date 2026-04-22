@@ -21,6 +21,7 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.eventCenter": "事件中心",
     "nav.configManagement": "配置管理",
     "nav.botManagement": "Bot 管理",
+    "nav.followSessions": "跟进会话",
     "nav.logout": "退出登录",
 
     // Common
@@ -98,6 +99,7 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.eventCenter": "Event Center",
     "nav.configManagement": "Config Management",
     "nav.botManagement": "Bot Management",
+    "nav.followSessions": "Follow Sessions",
     "nav.logout": "Logout",
 
     // Common

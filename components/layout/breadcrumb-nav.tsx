@@ -12,6 +12,7 @@ const pathKeyMap: Record<string, string> = {
   "clue-followup": "nav.clueFollowup",
   "event-center": "nav.eventCenter",
   "bot-management": "nav.botManagement",
+  "follow-sessions": "nav.followSessions",
   "config-management": "nav.configManagement",
 }
 

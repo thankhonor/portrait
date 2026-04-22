@@ -7,6 +7,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useLanguage } from "@/contexts/language-context"
+import { useUnread } from "@/contexts/unread-context"
 import {
   ChevronLeft,
   ChevronRight,
@@ -20,6 +21,7 @@ import {
   Cpu,
   Settings,
   Bot,
+  MessageSquareMore,
 } from "lucide-react"
 
 interface NavItem {
@@ -40,7 +42,7 @@ const navModules: NavModule[] = [
     icon: <Shield className="w-5 h-5" />,
     items: [
       { titleKey: "nav.clueFollowup", href: "/antifraud/clue-followup", icon: <UserSearch className="w-4 h-4" /> },
-      { titleKey: "nav.botManagement", href: "/antifraud/bot-management", icon: <Bot className="w-4 h-4" /> },
+      { titleKey: "nav.followSessions", href: "/antifraud/follow-sessions", icon: <MessageSquareMore className="w-4 h-4" /> },
       { titleKey: "nav.configManagement", href: "/antifraud/config-management", icon: <Settings className="w-4 h-4" /> },
     ],
   },
@@ -51,6 +53,10 @@ export function AppSidebar() {
   const [expandedModules, setExpandedModules] = useState<string[]>(["nav.antifraud"])
   const pathname = usePathname()
   const { t } = useLanguage()
+  const { hasUnread } = useUnread()
+
+  const showUnread = (item: NavItem) =>
+    item.href === "/antifraud/follow-sessions" && hasUnread
 
   const toggleModule = (titleKey: string) => {
     setExpandedModules((prev) =>
@@ -114,7 +120,12 @@ export function AppSidebar() {
                         : "text-sidebar-muted hover:text-sidebar-foreground hover:bg-sidebar-accent/50",
                     )}
                   >
-                    {item.icon}
+                    <span className="relative">
+                      {item.icon}
+                      {showUnread(item) && (
+                        <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full" />
+                      )}
+                    </span>
                     <span>{t(item.titleKey)}</span>
                   </Link>
                 ))}
@@ -128,12 +139,15 @@ export function AppSidebar() {
                     key={item.href}
                     href={item.href}
                     className={cn(
-                      "flex items-center justify-center py-2 transition-colors",
+                      "relative flex items-center justify-center py-2 transition-colors",
                       isActive(item.href) ? "text-sidebar-primary" : "text-sidebar-muted hover:text-sidebar-foreground",
                     )}
                     title={t(item.titleKey)}
                   >
                     {item.icon}
+                    {item.hasUnread && (
+                      <span className="absolute top-1 right-3 w-2 h-2 bg-red-500 rounded-full" />
+                    )}
                   </Link>
                 ))}
               </div>

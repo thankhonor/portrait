@@ -38,7 +38,6 @@ import { MessageCircle } from "lucide-react"
 import { useLanguage } from "@/contexts/language-context"
 import { useState } from "react"
 import { StartFollowupDialog } from "./start-followup-dialog"
-import { ChatWorkstation } from "./chat-workstation"
 
 interface FlowStep {
   id: number
@@ -185,8 +184,6 @@ export function ClueFollowupTable({
   const [showColumnSettings, setShowColumnSettings] = useState(false)
   const [startFollowupDialogOpen, setStartFollowupDialogOpen] = useState(false)
   const [selectedClueForFollowup, setSelectedClueForFollowup] = useState<FollowupClue | null>(null)
-  const [chatWorkstationOpen, setChatWorkstationOpen] = useState(false)
-  const [selectedClueForWorkstation, setSelectedClueForWorkstation] = useState<FollowupClue | null>(null)
 
   const [visibleColumns, setVisibleColumns] = useState<Record<string, boolean>>(
     COLUMN_CONFIGS.reduce((acc, col) => ({ ...acc, [col.key]: col.defaultVisible }), {}),
@@ -330,7 +327,7 @@ export function ClueFollowupTable({
       )
     }
 
-    // 已留言、已建联：点击显示聊天工作台
+    // 已留言、已建联：点击新开标签页打开跟进会话
     if (clue.followStatus === "messaged" || clue.followStatus === "connected") {
       return (
         <span
@@ -338,8 +335,7 @@ export function ClueFollowupTable({
           style={{ backgroundColor: config.bgColor, color: config.textColor }}
           onClick={(e) => {
             e.stopPropagation()
-            setSelectedClueForWorkstation(clue)
-            setChatWorkstationOpen(true)
+            window.open(`/antifraud/follow-sessions?clueId=${encodeURIComponent(clue.id)}`, "_blank")
           }}
         >
           {config.icon}
@@ -368,19 +364,27 @@ export function ClueFollowupTable({
     const config = statusConfig[status || "pending"] || statusConfig.pending
 
     const statusBadge =
-      status === "ignored" && ignoreReason ? (
+      status === "ignored" ? (
         <HoverCard openDelay={200} closeDelay={100}>
           <HoverCardTrigger asChild>
             <span
-              className="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium cursor-pointer"
+              className="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium cursor-pointer hover:opacity-80 transition-opacity"
               style={{ backgroundColor: config.bgColor, color: config.textColor }}
+              onClick={(e) => {
+                e.stopPropagation()
+                if (clue) {
+                  window.open(`/antifraud/follow-sessions?clueId=${encodeURIComponent(clue.id)}`, "_blank")
+                }
+              }}
             >
               {config.label}
             </span>
           </HoverCardTrigger>
-          <HoverCardContent className="bg-gray-900 text-white border-gray-900 px-2 py-1 rounded-md w-auto">
-            <p className="text-xs whitespace-nowrap">{ignoreReason}</p>
-          </HoverCardContent>
+          {ignoreReason && (
+            <HoverCardContent className="bg-gray-900 text-white border-gray-900 px-2 py-1 rounded-md w-auto">
+              <p className="text-xs whitespace-nowrap">{ignoreReason}</p>
+            </HoverCardContent>
+          )}
         </HoverCard>
       ) : (
         <span
@@ -922,12 +926,6 @@ export function ClueFollowupTable({
           onConfirm={handleStartFollowupConfirm}
         />
 
-        {/* 聊天工作台 */}
-        <ChatWorkstation
-          open={chatWorkstationOpen}
-          onOpenChange={setChatWorkstationOpen}
-          clue={selectedClueForWorkstation}
-        />
       </div>
     </>
   )

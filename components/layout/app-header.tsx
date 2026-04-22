@@ -1,6 +1,5 @@
 "use client"
 
-import { useTheme } from "@/contexts/theme-context"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -9,12 +8,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Bell, Sun, Moon, Globe, User, LogOut } from "lucide-react"
+import { User, LogOut } from "lucide-react"
 import { BreadcrumbNav } from "./breadcrumb-nav"
 
 export function AppHeader() {
-  const { theme, toggleTheme } = useTheme()
-
   return (
     <header className="h-14 border-b border-sidebar-border bg-sidebar flex items-center justify-between px-4">
       {/* Breadcrumb Navigation - Left side */}
@@ -22,34 +19,6 @@ export function AppHeader() {
 
       {/* Right side controls */}
       <div className="flex items-center gap-2">
-        {/* Notification Bell */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="relative text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
-        >
-          <Bell className="w-5 h-5" />
-          <span className="absolute top-2 right-2 w-2 h-2 bg-destructive rounded-full" />
-        </Button>
-
-        {/* Theme Toggle */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={toggleTheme}
-          className="text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
-        >
-          {theme === "light" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-        </Button>
-
-        <Button
-          variant="ghost"
-          size="icon"
-          className="text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
-        >
-          <Globe className="w-5 h-5" />
-        </Button>
-
         {/* User Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

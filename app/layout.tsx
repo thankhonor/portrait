@@ -5,6 +5,7 @@ import "./globals.css"
 import { LanguageProvider } from "@/contexts/language-context"
 import { ThemeProvider } from "@/contexts/theme-context"
 import { RiskLabelCombinationProvider } from "@/components/shared/risk-label-combination-manager"
+import { UnreadProvider } from "@/contexts/unread-context"
 
 const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
@@ -25,7 +26,9 @@ export default function RootLayout({
       <body className="font-sans antialiased">
         <ThemeProvider>
           <LanguageProvider>
-            <RiskLabelCombinationProvider>{children}</RiskLabelCombinationProvider>
+            <UnreadProvider>
+              <RiskLabelCombinationProvider>{children}</RiskLabelCombinationProvider>
+            </UnreadProvider>
           </LanguageProvider>
         </ThemeProvider>
       </body>
