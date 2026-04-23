@@ -37,6 +37,11 @@ import {
   Phone,
   Users,
   History,
+  Calendar,
+  Image,
+  Link2,
+  Building,
+  AlertTriangle,
 } from "lucide-react"
 
 interface MultiLangMessage {
@@ -86,6 +91,14 @@ interface ConversationItem {
   sourceUrl: string
   original: string
   translation: string
+  publishTime: string
+  images: string[]
+  platformSource: string
+  sourceTitle: string
+  relatedDomain: string
+  gangType: "new" | "old"
+  contentType: "new" | "old"
+  portrait: string
 }
 
 const mockConversations: ConversationItem[] = [
@@ -121,6 +134,14 @@ const mockConversations: ConversationItem[] = [
     sourceUrl: "https://discord.gg/abcd1234",
     original: "专业刷单团队，日入500+，无需押金，工资日结。",
     translation: "",
+    publishTime: "2024-12-24 06:15:22",
+    images: ["/placeholder.svg", "/placeholder.svg"],
+    platformSource: "Discord",
+    sourceTitle: "Crypto Trading Hub",
+    relatedDomain: "discord.gg",
+    gangType: "new",
+    contentType: "new",
+    portrait: "历史会话",
   },
   {
     id: "2",
@@ -153,6 +174,14 @@ const mockConversations: ConversationItem[] = [
     sourceUrl: "http://darkforum.onion/thread/98765",
     original: "High quality credit card dumps, CVV full info available.",
     translation: "高质量信用卡转储，CVV完整信息可用。",
+    publishTime: "2024-12-23 18:42:10",
+    images: [],
+    platformSource: "暗网论坛",
+    sourceTitle: "Premium CC Market",
+    relatedDomain: "darkforum.onion",
+    gangType: "old",
+    contentType: "old",
+    portrait: "历史会话",
   },
   {
     id: "3",
@@ -186,6 +215,14 @@ const mockConversations: ConversationItem[] = [
     sourceUrl: "https://t.me/darkmarket_channel/12345",
     original: "出售银行卡四件套，身份证+银行卡+U盾+手机卡",
     translation: "",
+    publishTime: "2024-12-22 14:30:00",
+    images: ["/placeholder.svg"],
+    platformSource: "Telegram",
+    sourceTitle: "暗网市场频道",
+    relatedDomain: "t.me",
+    gangType: "new",
+    contentType: "old",
+    portrait: "历史会话",
   },
   {
     id: "4",
@@ -218,6 +255,14 @@ const mockConversations: ConversationItem[] = [
     sourceUrl: "",
     original: "代办车险理赔，无需出险现场，全程线上操作。",
     translation: "",
+    publishTime: "2024-12-24 09:20:15",
+    images: ["/placeholder.svg", "/placeholder.svg", "/placeholder.svg"],
+    platformSource: "微信",
+    sourceTitle: "车险理赔互助群",
+    relatedDomain: "",
+    gangType: "old",
+    contentType: "new",
+    portrait: "历史会话",
   },
   {
     id: "5",
@@ -251,6 +296,14 @@ const mockConversations: ConversationItem[] = [
     sourceUrl: "https://t.me/data_market/5678",
     original: "收购各银行内部员工数据，客户信息、账户余额等",
     translation: "",
+    publishTime: "2024-12-21 22:10:45",
+    images: [],
+    platformSource: "Telegram",
+    sourceTitle: "数据交易市场",
+    relatedDomain: "t.me",
+    gangType: "new",
+    contentType: "new",
+    portrait: "历史会话",
   },
   {
     id: "6",
@@ -283,6 +336,14 @@ const mockConversations: ConversationItem[] = [
     sourceUrl: "https://discord.gg/xyz5678",
     original: "专业刷单团队，日入500+，无需押金",
     translation: "",
+    publishTime: "2024-12-23 11:00:00",
+    images: ["/placeholder.svg"],
+    platformSource: "Discord",
+    sourceTitle: "刷单兼职群",
+    relatedDomain: "discord.gg",
+    gangType: "old",
+    contentType: "old",
+    portrait: "历史会话",
   },
   {
     id: "7",
@@ -316,6 +377,14 @@ const mockConversations: ConversationItem[] = [
     sourceUrl: "",
     original: "代办车险理赔，无需出险现场，全程线上操作。",
     translation: "",
+    publishTime: "2024-12-24 10:05:30",
+    images: ["/placeholder.svg", "/placeholder.svg"],
+    platformSource: "微信",
+    sourceTitle: "医保理赔互助群",
+    relatedDomain: "",
+    gangType: "old",
+    contentType: "new",
+    portrait: "历史会话",
   },
 ]
 
@@ -491,14 +560,15 @@ export function FollowSessionsWorkstation() {
   const [conversations, setConversations] = useState(mockConversations)
   const [iocData, setIocData] = useState(mockIOCMap)
   const scrollRef = useRef<HTMLDivElement>(null)
-  const { setHasUnread } = useUnread()
+  const { setHasUnread, setUnreadCount } = useUnread()
 
   const syncUnread = useCallback(
     (convs: ConversationItem[]) => {
       const totalUnread = convs.reduce((sum, c) => sum + c.unreadCount, 0)
       setHasUnread(totalUnread > 0)
+      setUnreadCount(totalUnread)
     },
-    [setHasUnread],
+    [setHasUnread, setUnreadCount],
   )
 
   useEffect(() => {
@@ -1026,48 +1096,137 @@ export function FollowSessionsWorkstation() {
                       {currentConv.clueId}
                     </div>
                   </div>
-                  <InfoRow icon={User} label="客户" value={currentConv.customer} />
-                  <InfoRow icon={Globe} label="渠道" value={currentConv.channel} />
-                  <InfoRow icon={Hash} label="发布人" value={currentConv.publisherId} />
-                  {currentConv.sourceUrl && (
-                    <div>
-                      <div className="text-xs text-gray-500 mb-1">来源URL</div>
-                      <div className="text-xs text-blue-600 break-all">
-                        {currentConv.sourceUrl}
-                      </div>
-                    </div>
-                  )}
+
+                  <InfoRow icon={Building} label="客户" value={currentConv.customer} />
+
                   <div>
-                    <div className="text-xs text-gray-500 mb-1">线索原文</div>
-                    <div className="text-sm text-gray-700 p-2 bg-gray-50 rounded border text-xs leading-relaxed">
-                      {currentConv.original}
+                    <div className="flex items-start gap-2">
+                      <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">
+                        <FileText className="w-4 h-4 text-gray-500" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs text-gray-500 mb-1">线索原文</div>
+                        <div className="text-sm text-gray-700 p-2 bg-gray-50 rounded border leading-relaxed">
+                          {currentConv.original}
+                        </div>
+                        {currentConv.translation && (
+                          <>
+                            <div className="text-xs text-gray-500 mb-1 mt-2">中文翻译</div>
+                            <div className="text-sm text-gray-700 p-2 bg-blue-50 rounded border border-blue-100 leading-relaxed">
+                              {currentConv.translation}
+                            </div>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
-                  {currentConv.translation && (
-                    <div>
-                      <div className="text-xs text-gray-500 mb-1">中文翻译</div>
-                      <div className="text-sm text-gray-700 p-2 bg-gray-50 rounded border text-xs leading-relaxed">
-                        {currentConv.translation}
+
+                  <div>
+                    <div className="flex items-start gap-2">
+                      <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">
+                        <Image className="w-4 h-4 text-gray-500" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs text-gray-500 mb-1">图片内容</div>
+                        {currentConv.images.length > 0 ? (
+                          <div className="flex gap-2 flex-wrap">
+                            {currentConv.images.slice(0, 2).map((img, idx) => (
+                              <div key={idx} className="w-16 h-16 rounded border border-gray-200 bg-gray-100 overflow-hidden">
+                                <img src={img} alt={`图片${idx + 1}`} className="w-full h-full object-cover" />
+                              </div>
+                            ))}
+                            {currentConv.images.length > 2 && (
+                              <span className="text-xs text-gray-400 self-end">+{currentConv.images.length - 2}</span>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-xs text-gray-400">无</span>
+                        )}
                       </div>
                     </div>
-                  )}
-                  <InfoRow
-                    icon={ShieldAlert}
-                    label="风险场景"
-                    value={currentConv.riskScene}
-                  />
+                  </div>
+
                   <div>
-                    <div className="text-xs text-gray-500 mb-2">风险标签</div>
-                    <div className="flex flex-wrap gap-1.5">
-                      {currentConv.riskTags.map((tag) => (
-                        <Badge
-                          key={tag}
-                          variant="outline"
-                          className="text-[11px] text-orange-600 border-orange-200 bg-orange-50"
-                        >
-                          {tag}
-                        </Badge>
-                      ))}
+                    <div className="flex items-start gap-2">
+                      <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">
+                        <Globe className="w-4 h-4 text-gray-500" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs text-gray-500 mb-1">来源信息</div>
+                        <div className="flex flex-col gap-1 text-xs p-2 bg-gray-50 rounded border border-gray-100">
+                          <div className="flex gap-1">
+                            <span className="text-gray-400 shrink-0 w-16">发布时间：</span>
+                            <span className="text-gray-700">{currentConv.publishTime}</span>
+                          </div>
+                          <div className="flex gap-1">
+                            <span className="text-gray-400 shrink-0 w-16">发布渠道：</span>
+                            <span className="text-gray-700">{currentConv.channel}</span>
+                          </div>
+                          <div className="flex gap-1">
+                            <span className="text-gray-400 shrink-0 w-16">发布人：</span>
+                            <span className="text-gray-700 font-mono">{currentConv.publisherId}</span>
+                          </div>
+                          <div className="flex gap-1">
+                            <span className="text-gray-400 shrink-0 w-16">平台/来源：</span>
+                            <span className="text-gray-700">{currentConv.platformSource}</span>
+                          </div>
+                          <div className="flex gap-1">
+                            <span className="text-gray-400 shrink-0 w-16">群组/标题：</span>
+                            <span className="text-gray-700">{currentConv.sourceTitle}</span>
+                          </div>
+                          {currentConv.relatedDomain && (
+                            <div className="flex gap-1">
+                              <span className="text-gray-400 shrink-0 w-16">域名：</span>
+                              <span className="text-gray-700">{currentConv.relatedDomain}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex items-start gap-2">
+                      <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">
+                        <AlertTriangle className="w-4 h-4 text-gray-500" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs text-gray-500 mb-1">风险信息</div>
+                        <div className="flex flex-col gap-1.5 text-xs">
+                          <div className="flex items-center gap-1">
+                            <span className="text-gray-400 shrink-0">新老团伙：</span>
+                            <Badge variant="outline" className="bg-orange-50 text-orange-600 border-orange-200 text-[11px]">
+                              {currentConv.gangType === "new" ? "新团伙" : "老团伙"}
+                            </Badge>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <span className="text-gray-400 shrink-0">新老内容：</span>
+                            <Badge variant="outline" className="bg-teal-50 text-teal-600 border-teal-200 text-[11px]">
+                              {currentConv.contentType === "new" ? "新内容" : "老内容"}
+                            </Badge>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <span className="text-gray-400 shrink-0">风险场景：</span>
+                            <Badge variant="outline" className="bg-purple-50 text-purple-600 border-purple-200 text-[11px]">
+                              {currentConv.riskScene}
+                            </Badge>
+                          </div>
+                          <div className="flex items-start gap-1">
+                            <span className="text-gray-400 shrink-0">风险标签：</span>
+                            <div className="flex flex-wrap gap-1">
+                              {currentConv.riskTags.map((tag) => (
+                                <Badge
+                                  key={tag}
+                                  variant="outline"
+                                  className="text-[11px] text-blue-600 border-blue-200 bg-blue-50"
+                                >
+                                  {tag}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>

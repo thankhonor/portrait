@@ -53,7 +53,7 @@ export function AppSidebar() {
   const [expandedModules, setExpandedModules] = useState<string[]>(["nav.antifraud"])
   const pathname = usePathname()
   const { t } = useLanguage()
-  const { hasUnread } = useUnread()
+  const { hasUnread, unreadCount } = useUnread()
 
   const showUnread = (item: NavItem) =>
     item.href === "/antifraud/follow-sessions" && hasUnread
@@ -120,13 +120,13 @@ export function AppSidebar() {
                         : "text-sidebar-muted hover:text-sidebar-foreground hover:bg-sidebar-accent/50",
                     )}
                   >
-                    <span className="relative">
-                      {item.icon}
-                      {showUnread(item) && (
-                        <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full" />
-                      )}
-                    </span>
-                    <span>{t(item.titleKey)}</span>
+                    {item.icon}
+                    <span className="flex-1">{t(item.titleKey)}</span>
+                    {showUnread(item) && (
+                      <span className="min-w-4 h-4 px-1 flex items-center justify-center bg-red-500 text-white text-[10px] font-medium rounded-full leading-none">
+                        {unreadCount > 99 ? "99+" : unreadCount}
+                      </span>
+                    )}
                   </Link>
                 ))}
               </div>
@@ -145,8 +145,10 @@ export function AppSidebar() {
                     title={t(item.titleKey)}
                   >
                     {item.icon}
-                    {item.hasUnread && (
-                      <span className="absolute top-1 right-3 w-2 h-2 bg-red-500 rounded-full" />
+                    {showUnread(item) && (
+                      <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 flex items-center justify-center bg-red-500 text-white text-[10px] font-medium rounded-full">
+                        {unreadCount > 99 ? "99+" : unreadCount}
+                      </span>
                     )}
                   </Link>
                 ))}
