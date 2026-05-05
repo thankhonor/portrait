@@ -156,7 +156,7 @@ const COLUMN_CONFIGS: ColumnConfig[] = [
   { key: "clueText", label: "线索原文", defaultVisible: true },
   { key: "imageContent", label: "图片内容", defaultVisible: true },
   { key: "sourceInfo", label: "来源信息", defaultVisible: true },
-  { key: "portrait", label: "黑产画像", defaultVisible: true },
+  { key: "ioc", label: "关键证据（IOC）", defaultVisible: true },
   { key: "riskInfo", label: "风险信息", defaultVisible: true },
   { key: "status", label: "状态", defaultVisible: true },
   { key: "remarks", label: "备注", defaultVisible: true },
@@ -184,6 +184,8 @@ export function ClueFollowupTable({
   const [showColumnSettings, setShowColumnSettings] = useState(false)
   const [startFollowupDialogOpen, setStartFollowupDialogOpen] = useState(false)
   const [selectedClueForFollowup, setSelectedClueForFollowup] = useState<FollowupClue | null>(null)
+  const [offlineFollowupDialogOpen, setOfflineFollowupDialogOpen] = useState(false)
+  const [selectedClueForOfflineFollowup, setSelectedClueForOfflineFollowup] = useState<FollowupClue | null>(null)
 
   const [visibleColumns, setVisibleColumns] = useState<Record<string, boolean>>(
     COLUMN_CONFIGS.reduce((acc, col) => ({ ...acc, [col.key]: col.defaultVisible }), {}),
@@ -225,8 +227,13 @@ export function ClueFollowupTable({
 
   // 打开开始跟进弹窗
   const handleStartFollowupClick = (clue: FollowupClue) => {
-    setSelectedClueForFollowup(clue)
-    setStartFollowupDialogOpen(true)
+    if (clue.channel === "Telegram") {
+      setSelectedClueForFollowup(clue)
+      setStartFollowupDialogOpen(true)
+    } else {
+      setSelectedClueForOfflineFollowup(clue)
+      setOfflineFollowupDialogOpen(true)
+    }
   }
 
   // 确认开始跟进
@@ -464,11 +471,11 @@ export function ClueFollowupTable({
                 {visibleColumns.sourceInfo && (
                   <th className="px-3 py-3 text-left text-sm font-medium bg-muted">来源信息</th>
                 )}
-                {visibleColumns.portrait && (
-                  <th className="px-3 py-3 text-left text-sm font-medium bg-muted">黑产画像</th>
-                )}
                 {visibleColumns.riskInfo && (
                   <th className="px-3 py-3 text-left text-sm font-medium bg-muted">风险信息</th>
+                )}
+                {visibleColumns.ioc && (
+                  <th className="px-3 py-3 text-left text-sm font-medium bg-muted">关键证据（IOC）</th>
                 )}
                 <th className="px-3 py-3 text-left text-sm font-medium bg-muted">状态</th>
                 {visibleColumns.remarks && <th className="px-3 py-3 text-left text-sm font-medium bg-muted">备注</th>}
@@ -683,25 +690,6 @@ export function ClueFollowupTable({
                         </div>
                       </TableCell>
                     )}
-                    {visibleColumns.portrait && (
-                      <TableCell className="px-4 py-3">
-                        <div className="flex flex-col items-start">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-7 text-xs text-purple-600 border-purple-300 hover:bg-purple-50 hover:text-purple-700 bg-transparent"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              setSelectedClueForChat(clue)
-                              setChatHistoryOpen(true)
-                            }}
-                          >
-                            <MessageSquare className="w-3.5 h-3.5 mr-1" />
-                            历史会话
-                          </Button>
-                        </div>
-                      </TableCell>
-                    )}
                     {visibleColumns.riskInfo && (
                       <TableCell className="px-4 py-3">
                         <div className="flex flex-col gap-1 text-xs">
@@ -738,6 +726,37 @@ export function ClueFollowupTable({
                             </div>
                           </div>
                         </div>
+                      </TableCell>
+                    )}
+                    {visibleColumns.ioc && (
+                      <TableCell className="px-4 py-3">
+                        {clue.iocs && clue.iocs.length > 0 ? (
+                          <HoverCard openDelay={200} closeDelay={100}>
+                            <HoverCardTrigger asChild>
+                              <div className="cursor-pointer">
+                                <p className="text-sm font-medium text-blue-600">共 {clue.iocs.length} 个</p>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  {[...new Set(clue.iocs.map(ioc => ioc.type))].join("、")}
+                                </p>
+                              </div>
+                            </HoverCardTrigger>
+                            <HoverCardContent className="w-80 bg-slate-900 text-white border-slate-700 p-4" side="bottom" align="start">
+                              <div className="space-y-3">
+                                <p className="text-yellow-400 text-sm font-medium">关键证据（IOC）：</p>
+                                <div className="space-y-2">
+                                  {clue.iocs.map((ioc, index) => (
+                                    <div key={index} className="border-l-2 border-blue-400 pl-2">
+                                      <p className="text-xs text-blue-400 font-medium">{ioc.type}</p>
+                                      <p className="text-xs text-slate-200 break-all">{ioc.value}</p>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            </HoverCardContent>
+                          </HoverCard>
+                        ) : (
+                          <span className="text-muted-foreground text-sm">无</span>
+                        )}
                       </TableCell>
                     )}
                     <td className="px-4 py-3">{renderStatus(clue.status, clue.ignoreReason, clue)}</td>
@@ -925,6 +944,36 @@ export function ClueFollowupTable({
           clue={selectedClueForFollowup}
           onConfirm={handleStartFollowupConfirm}
         />
+
+        {/* 离线跟进提示弹窗 */}
+        <Dialog open={offlineFollowupDialogOpen} onOpenChange={setOfflineFollowupDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>确认跟进黑产？</DialogTitle>
+            </DialogHeader>
+            <div className="py-4">
+              <p className="text-sm text-muted-foreground">
+                当前渠道（{selectedClueForOfflineFollowup?.channel}）暂不支持线上跟进，需要线下跟进
+              </p>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setOfflineFollowupDialogOpen(false)}>
+                取消
+              </Button>
+              <Button
+                onClick={() => {
+                  if (selectedClueForOfflineFollowup && onStartFollowup) {
+                    onStartFollowup(selectedClueForOfflineFollowup)
+                  }
+                  setOfflineFollowupDialogOpen(false)
+                  setSelectedClueForOfflineFollowup(null)
+                }}
+              >
+                确认
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
       </div>
     </>

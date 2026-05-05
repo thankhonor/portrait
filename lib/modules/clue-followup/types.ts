@@ -11,6 +11,11 @@ export interface ChatMessage {
   time: string
 }
 
+export interface IOC {
+  type: string
+  value: string
+}
+
 export interface FollowupClue {
   id: string
   captureTime: string
@@ -43,6 +48,7 @@ export interface FollowupClue {
   ignoreOperator?: string // 暂不关注操作人
   ignoreTime?: string // 暂不关注操作时间
   remarks?: string // 备注
+  iocs?: IOC[] // 关键证据（IOC）
 }
 
 export interface ClueFollowupFilters {

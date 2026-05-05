@@ -22,6 +22,7 @@ import {
   Settings,
   Bot,
   MessageSquareMore,
+  Fingerprint,
 } from "lucide-react"
 
 interface NavItem {
@@ -43,6 +44,7 @@ const navModules: NavModule[] = [
     items: [
       { titleKey: "nav.clueFollowup", href: "/antifraud/clue-followup", icon: <UserSearch className="w-4 h-4" /> },
       { titleKey: "nav.followSessions", href: "/antifraud/follow-sessions", icon: <MessageSquareMore className="w-4 h-4" /> },
+      { titleKey: "nav.gangProfile", href: "/antifraud/gang-profile", icon: <Fingerprint className="w-4 h-4" /> },
       { titleKey: "nav.configManagement", href: "/antifraud/config-management", icon: <Settings className="w-4 h-4" /> },
     ],
   },

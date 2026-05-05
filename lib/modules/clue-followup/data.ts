@@ -129,6 +129,10 @@ export const clueFollowupMockClues: FollowupClue[] = [
     reviewer: "lisi",
     reviewTime: "2024-12-24 11:02:23",
     chatMessages: [],
+    iocs: [
+      { type: "用户昵称", value: "card_seller_888" },
+      { type: "联系方式", value: "@card_seller_888" },
+    ],
   },
   // 跟进中状态
   {
@@ -145,6 +149,10 @@ export const clueFollowupMockClues: FollowupClue[] = [
     followStartTime: "2024-12-25 12:21:38",
     chatMessages: [
       { id: "1", sender: "bot", content: "你好，看到你们招刷单的，怎么操作？", time: "2024-12-24 17:00:00" },
+    ],
+    iocs: [
+      { type: "用户昵称", value: "shuadan_master" },
+      { type: "其他联系方式", value: "shuadan_master#1234" },
     ],
   },
   // 暂不关注状态
@@ -163,6 +171,10 @@ export const clueFollowupMockClues: FollowupClue[] = [
     ignoreTime: "2024-12-29 16:21:11",
     ignoreReason: "未获取有效信息，黑产不回复",
     chatMessages: [],
+    iocs: [
+      { type: "用户昵称", value: "CreditKing2024" },
+      { type: "暗网地址", value: "darkforum.onion" },
+    ],
   },
   // 跟进中状态 - 已建联
   {
@@ -181,6 +193,10 @@ export const clueFollowupMockClues: FollowupClue[] = [
       { id: "1", sender: "bot", content: "你好，车险理赔怎么弄？", time: "2024-12-24 09:30:00" },
       { id: "2", sender: "target", content: "发票和病历就行，其他我们搞定", time: "2024-12-24 09:35:00" },
     ],
+    iocs: [
+      { type: "用户昵称", value: "fake_claim_888" },
+      { type: "诈骗类型", value: "保险理赔诈骗" },
+    ],
   },
   // 待跟进状态
   {
@@ -194,6 +210,10 @@ export const clueFollowupMockClues: FollowupClue[] = [
     reviewer: "lisi",
     reviewTime: "2024-12-24 11:02:23",
     chatMessages: [],
+    iocs: [
+      { type: "用户昵称", value: "data_buyer_pro" },
+      { type: "其他联系方式", value: "@data_buyer_pro" },
+    ],
   },
   // 跟进中状态 - 留言失败
   {
@@ -210,6 +230,10 @@ export const clueFollowupMockClues: FollowupClue[] = [
     followStartTime: "2024-12-25 12:21:38",
     failReason: "对方账号已关闭私信功能，无法发送留言",
     chatMessages: [],
+    iocs: [
+      { type: "用户昵称", value: "card_seller_888" },
+      { type: "售卖类型", value: "银行卡四件套" },
+    ],
   },
   // 暂不关注状态
   {
@@ -228,6 +252,9 @@ export const clueFollowupMockClues: FollowupClue[] = [
     ignoreTime: "2024-12-30 09:00:00",
     ignoreReason: "重复线索，已合并到其他任务",
     chatMessages: [{ id: "1", sender: "bot", content: "代下单服务怎么收费？", time: "2024-12-24 13:30:00" }],
+    iocs: [
+      { type: "用户昵称", value: "shuadan_master" },
+    ],
   },
   // 待跟进状态
   {
@@ -240,6 +267,10 @@ export const clueFollowupMockClues: FollowupClue[] = [
     reviewer: "lisi",
     reviewTime: "2024-12-24 11:02:23",
     chatMessages: [],
+    iocs: [
+      { type: "用户昵称", value: "CreditKing2024" },
+      { type: "接受支付", value: "BTC/USDT" },
+    ],
   },
   // 跟进中状态
   {
@@ -258,6 +289,10 @@ export const clueFollowupMockClues: FollowupClue[] = [
       { id: "1", sender: "bot", content: "医保报销需要哪些材料？", time: "2024-12-24 16:00:00" },
       { id: "2", sender: "target", content: "发票和病历就行，其他我们搞定", time: "2024-12-24 16:10:00" },
     ],
+    iocs: [
+      { type: "用户昵称", value: "fake_claim_888" },
+      { type: "诈骗类型", value: "医保诈骗" },
+    ],
   },
   // 跟进中状态
   {
@@ -273,5 +308,9 @@ export const clueFollowupMockClues: FollowupClue[] = [
     follower: "wangwu",
     followStartTime: "2024-12-25 12:21:38",
     chatMessages: [{ id: "1", sender: "bot", content: "支付通道费率多少？", time: "2024-12-24 17:30:00" }],
+    iocs: [
+      { type: "用户昵称", value: "data_buyer_pro" },
+      { type: "出售类型", value: "内部员工数据" },
+    ],
   },
 ]

@@ -22,6 +22,7 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.configManagement": "配置管理",
     "nav.botManagement": "Bot 管理",
     "nav.followSessions": "跟进会话",
+    "nav.gangProfile": "黑产画像",
     "nav.logout": "退出登录",
 
     // Common
@@ -100,6 +101,7 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.configManagement": "Config Management",
     "nav.botManagement": "Bot Management",
     "nav.followSessions": "Follow Sessions",
+    "nav.gangProfile": "Gang Profile",
     "nav.logout": "Logout",
 
     // Common
