@@ -70,12 +70,9 @@ export default function ClueFollowupPage() {
       <div className="flex-1 overflow-auto mt-3">
         <ClueFollowupTable
           clues={paginatedClues}
-          selectedIds={selectedIds}
-          onSelectChange={setSelectedIds}
-          onStartFollow={handleStartFollow}
+          onStartFollowup={handleStartFollow}
           onIgnore={handleIgnore}
           onCreateEvent={handleCreateEvent}
-          totalCount={clues.length}
         />
       </div>
 
