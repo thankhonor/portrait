@@ -15,10 +15,10 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { Check, Upload, X, ChevronDown, ChevronUp } from "lucide-react"
+import { Check, Upload, X, ChevronDown, ChevronUp, Plus, Trash2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
-import type { FollowupClue } from "@/lib/modules/clue-followup/types"
+import type { FollowupClue, IOC } from "@/lib/modules/clue-followup/types"
 
 interface GenerateEventDrawerProps {
   open: boolean
@@ -43,6 +43,43 @@ const riskTagOptions = [
   "数据泄露",
 ]
 
+// IOC 类型选项及解释
+const iocTypeDescriptions: Record<string, string> = {
+  "订单号": "用户下单后系统生成的唯一标识编号，用于追踪订单状态、物流、售后等全流程",
+  "物流单号": "包裹发货后由快递公司分配的追踪编号，可用于查询运输轨迹和签收状态",
+  "退货ID": "用户发起退货/退款申请后系统生成的唯一标识，关联退货商品、原因、金额等信息",
+  "优惠券": "平台或商家发放的抵扣凭证，包含金额、使用条件、有效期等信息，用于订单金额减免",
+  "会员昵称": "用户在平台设置的个性化名称，用于社交互动、评论展示等公开场景",
+  "用户账号ID": "系统为用户分配的内部唯一标识，通常不对外公开，用于关联用户所有行为数据",
+  "用户昵称": "用户自主设定的公开显示名称，用于社交互动、评论展示等场景",
+  "邮箱": "用户注册或绑定的电子邮箱地址，常用于登录、接收订单通知、营销邮件等",
+  "手机号": "用户绑定的手机号码，用于登录、身份验证、接收短信通知等",
+  "身份证号": "用户的个人身份证明号码，通常在实名认证、跨境清关、退税费等场景下收集",
+  "商品ID": "平台为每个商品分配的内部唯一标识，用于商品信息检索、库存管理、订单关联等",
+  "ASIN号": "Amazon Standard Identification Number，亚马逊平台的标准商品编号，用于唯一标识一个商品",
+  "SKU号": "Stock Keeping Unit，库存量单位，用于区分同一商品的不同规格（如颜色、尺寸、版本）",
+  "营销分享链接": "用户或达人用于推广商品的专属链接/代码，可用于追踪推广效果并计算佣金",
+  "商户名称": "入驻平台的商家或品牌的官方名称，用于区分不同卖家的商品和服务",
+  "直播间ID": "直播间的唯一标识编号，用于关联直播场次、互动数据、商品链接等",
+  "主播账号ID": "进行直播带货的主播所绑定的账户唯一标识，用于关联主播的销售业绩和粉丝数据",
+  "卡号": "用户的银行卡号或礼品卡号，用于支付、退款或余额充值等资金操作",
+  "兑换码": "由平台或商家生成的数字/字母串，可用于兑换商品、优惠券、虚拟物品等",
+  "钱包账户ID": "用户在平台内置钱包中的账户唯一标识，用于管理余额、交易流水、提现等",
+  "申诉ID": "用户对订单、账号封禁等结果不满并发起申诉后，系统生成的唯一工单编号",
+  "客户咨询ID": "用户联系客服时系统生成的咨询工单编号，用于追踪问题处理进度和历史记录",
+  "收件地址": "用户填写的收货详细信息（包含姓名、电话、省市区、街道门牌号等），用于包裹配送",
+  "验证码": "通过短信、邮件或APP发送的一次性数字/字母码，用于登录验证、修改密码、确认操作等安全场景",
+  "其他联系方式": "除邮箱、手机号外的其他联系途径，如社交媒体账号、即时通讯ID等",
+  "暗网地址": "隐藏服务网络上的地址或链接，常用于非法交易、信息买卖等违法活动",
+  "诈骗类型": "诈骗行为的分类标签，如身份冒用、虚假交易、钓鱼欺诈等",
+  "接受支付": "骗子或黑产接受的支付方式，如加密货币、转账、第三方支付等",
+  "出售类型": "黑产出售的商品或服务类别，如个人信息、虚拟物品、非法工具等",
+  "售卖类型": "同'出售类型'，指非法销售的商品或服务的分类",
+  "来自频道": "线索或风险信息的发现渠道，如Telegram群组、Discord服务器、暗网论坛、微信群等具体来源",
+}
+
+const iocTypeOptions = Object.keys(iocTypeDescriptions)
+
 export function GenerateEventDrawer({ open, onOpenChange, clue, onSuccess }: GenerateEventDrawerProps) {
   const [activeTab, setActiveTab] = useState<"new" | "merge">("new")
 
@@ -54,6 +91,7 @@ export function GenerateEventDrawer({ open, onOpenChange, clue, onSuccess }: Gen
   const [riskSummary, setRiskSummary] = useState("")
   const [eventTitle, setEventTitle] = useState("")
   const [attachments, setAttachments] = useState<File[]>([])
+  const [iocs, setIocs] = useState<IOC[]>([])
 
   const [riskInfoExpanded, setRiskInfoExpanded] = useState(true)
   const [mergeEventsExpanded, setMergeEventsExpanded] = useState(true)
@@ -67,6 +105,7 @@ export function GenerateEventDrawer({ open, onOpenChange, clue, onSuccess }: Gen
       setIsNewContent(clue.isNewContent ? "new" : "old")
       setRiskScene(clue.riskScene || "")
       setSelectedRiskTags(clue.riskTags || [])
+      setIocs(clue.iocs || [])
     }
   }, [clue])
 
@@ -88,6 +127,7 @@ export function GenerateEventDrawer({ open, onOpenChange, clue, onSuccess }: Gen
     setRiskSummary("")
     setEventTitle("")
     setAttachments([])
+    setIocs([])
   }
 
   // 取消
@@ -117,6 +157,25 @@ export function GenerateEventDrawer({ open, onOpenChange, clue, onSuccess }: Gen
   // 删除附件
   const removeAttachment = (index: number) => {
     setAttachments((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  // 添加IOC记录
+  const addIOC = () => {
+    setIocs((prev) => [...prev, { type: "", value: "" }])
+  }
+
+  // 更新IOC记录
+  const updateIOC = (index: number, field: "type" | "value", value: string) => {
+    setIocs((prev) => {
+      const updated = [...prev]
+      updated[index] = { ...updated[index], [field]: value }
+      return updated
+    })
+  }
+
+  // 删除IOC记录
+  const removeIOC = (index: number) => {
+    setIocs((prev) => prev.filter((_, i) => i !== index))
   }
 
   if (!clue) return null
@@ -431,6 +490,69 @@ export function GenerateEventDrawer({ open, onOpenChange, clue, onSuccess }: Gen
                             </div>
                           )}
                         </div>
+                      </div>
+
+                      {/* 关键证据（IOC） */}
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <Label>关键证据（IOC）</Label>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-7 gap-1"
+                            onClick={addIOC}
+                          >
+                            <Plus className="w-4 h-4" />
+                            新增
+                          </Button>
+                        </div>
+                        {iocs.length > 0 && (
+                          <div className="border rounded-md overflow-hidden">
+                            <div className="divide-y">
+                              {iocs.map((ioc, index) => (
+                                <div key={index} className="p-3 flex gap-3 items-end bg-background hover:bg-muted/30 transition-colors">
+                                  <div className="flex-1 flex gap-0">
+                                    <div className="flex-1">
+                                      <Select value={ioc.type} onValueChange={(value) => updateIOC(index, "type", value)}>
+                                        <SelectTrigger className="text-sm rounded-r-none" title={ioc.type ? iocTypeDescriptions[ioc.type] : "选择类型"}>
+                                          <SelectValue placeholder="选择类型" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          {iocTypeOptions.map((type) => (
+                                            <SelectItem key={type} value={type} title={iocTypeDescriptions[type]}>
+                                              <div className="flex flex-col gap-1">
+                                                <div>{type}</div>
+                                              </div>
+                                            </SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
+                                    <Input
+                                      placeholder="输入对应值"
+                                      value={ioc.value}
+                                      onChange={(e) => updateIOC(index, "value", e.target.value)}
+                                      className="text-sm rounded-l-none flex-1 border-l-0"
+                                    />
+                                  </div>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 p-0 text-red-600 hover:bg-red-50"
+                                    onClick={() => removeIOC(index)}
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        {iocs.length === 0 && (
+                          <div className="border border-dashed rounded-md p-4 text-center">
+                            <p className="text-sm text-muted-foreground">点击"新增"按钮添加关键证据</p>
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}
