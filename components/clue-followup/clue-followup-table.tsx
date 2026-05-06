@@ -696,13 +696,13 @@ export function ClueFollowupTable({
                           <div className="flex items-center gap-1">
                             <span className="text-muted-foreground shrink-0">新老团伙：</span>
                             <Badge variant="outline" className="bg-orange-50 text-orange-600 border-orange-200">
-                              {clue.gangType === "new" ? "新团伙" : "老团伙"}
+                              {clue.isNewGang ? "新团伙" : "老团伙"}
                             </Badge>
                           </div>
                           <div className="flex items-center gap-1">
                             <span className="text-muted-foreground shrink-0">新老内容：</span>
                             <Badge variant="outline" className="bg-teal-50 text-teal-600 border-teal-200">
-                              {clue.contentType === "new" ? "新内容" : "老内容"}
+                              {clue.isNewContent ? "新内容" : "老内容"}
                             </Badge>
                           </div>
                           <div className="flex items-center gap-1">

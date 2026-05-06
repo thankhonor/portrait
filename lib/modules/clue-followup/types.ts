@@ -47,6 +47,7 @@ export interface FollowupClue {
   followStartTime?: string // 开始跟进时间
   ignoreOperator?: string // 暂不关注操作人
   ignoreTime?: string // 暂不关注操作时间
+  failReason?: string // 失败原因
   remarks?: string // 备注
   iocs?: IOC[] // 关键证据（IOC）
 }

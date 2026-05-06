@@ -26,7 +26,7 @@ export interface Clue {
   operator?: string
   operationTime?: string
   ignoreReason?: string
-  followStatus?: "pending" | "following" | "messageFailed" | "messaged" | "connected"
+  followStatus?: "pending" | "following" | "messageFailed" | "messaged" | "connected" | "ignored"
   botId?: string
   chatMessages?: ChatMessage[]
   reviewer?: string
