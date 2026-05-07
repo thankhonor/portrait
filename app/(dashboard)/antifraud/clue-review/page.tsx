@@ -58,7 +58,7 @@ export default function ClueReviewPage() {
         c.id === clue.id
           ? {
               ...c,
-              followStatus: "ignored" as const,
+              followStatus: "ignored" as any,
               status: "ignored" as const,
               ignoreReason: reason,
               operator: getShortUsername(CURRENT_USER),
